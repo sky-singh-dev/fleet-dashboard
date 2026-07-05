@@ -1,4 +1,9 @@
-import { Dialog, DialogContent, IconButton } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  IconButton,
+  LinearProgress,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PersonIcon from "@mui/icons-material/Person";
@@ -30,7 +35,7 @@ function Card({
         <span>{name}</span>
       </div>
       {isStatus ? (
-        <span className="inline-flex items-center gap-1 bg-green-100/60 text-green-700 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-200 uppercase tracking-wide">
+        <span className="inline-flex items-center gap-1 bg-green-100/60 text-green-700 text-[10px] font-extrabold px-2 py-0.5 rounded-md border border-green-200 uppercase tracking-wide w-max">
           <CheckCircleIcon className="!text-xs" />
           {value ?? "--"}
         </span>
@@ -146,26 +151,33 @@ export function VehicleDetailModal() {
 
           {/* 7. BATTERY LEVEL CARD (With Red Progress Bar) */}
           <div className="bg-slate-50/80 border-l-[3.5px] border-blue-600 rounded-r-xl rounded-l-sm p-3.5 flex flex-col justify-between min-h-[76px]">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
-              <BatteryStdIcon className="!text-[11px]" />
+            <div className="flex items-center gap-[2px] text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+              <BatteryStdIcon className="!text-[12px]" />
               <span>Battery Level</span>
             </div>
             <div className="mt-2 w-full">
               <span className="text-sm font-extrabold text-slate-900 block mb-1">
                 {vehicle?.batteryLevel}%
               </span>
-              <div className="w-full bg-slate-200/70 h-1 rounded-full overflow-hidden">
-                <div
-                  className="bg-red-500 h-full rounded-full"
-                  style={{ width: `${vehicle?.batteryLevel}%` }}
-                />
-              </div>
+              <LinearProgress
+                sx={{
+                  height: 4,
+                  borderRadius: 3,
+                  "& .MuiLinearProgress-bar": {
+                    borderRadius: 3,
+                    backgroundColor: "red",
+                  },
+                }}
+                className="!bg-slate-200/70"
+                variant="determinate"
+                value={vehicle?.batteryLevel}
+              />
             </div>
           </div>
 
           {/* 8. FUEL LEVEL CARD (With Orange Progress Bar) */}
           <div className="bg-slate-50/80 border-l-[3.5px] border-blue-600 rounded-r-xl rounded-l-sm p-3.5 flex flex-col justify-between min-h-[76px]">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+            <div className="flex items-center gap-[2px] text-[10px] font-bold text-slate-400 tracking-wider uppercase">
               <LocalGasStationIcon className="!text-[11px]" />
               <span>Fuel Level</span>
             </div>
@@ -173,25 +185,24 @@ export function VehicleDetailModal() {
               <span className="text-sm font-extrabold text-slate-900 block mb-1">
                 {vehicle?.fuelLevel}%
               </span>
-              <div className="w-full bg-slate-200/70 h-1 rounded-full overflow-hidden">
-                <div
-                  className="bg-orange-500 h-full rounded-full"
-                  style={{ width: `${vehicle?.fuelLevel}%` }}
-                />
-              </div>
+              <LinearProgress
+                sx={{
+                  height: 4,
+                  borderRadius: 3,
+                  "& .MuiLinearProgress-bar": {
+                    borderRadius: 3,
+                    backgroundColor: "orange",
+                  },
+                }}
+                className="!bg-slate-200/70"
+                variant="determinate"
+                value={vehicle?.fuelLevel}
+              />
             </div>
           </div>
 
           {/* 9. LAST UPDATED CARD */}
-          {/* <div className="bg-slate-50/80 border-l-[3.5px] border-blue-600 rounded-r-xl rounded-l-sm p-3.5 flex flex-col justify-between min-h-[76px]">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 tracking-wider uppercase">
-              <AccessTimeIcon className="!text-[11px]" />
-              <span>Last Updated</span>
-            </div>
-            <span className="text-xs font-extrabold text-slate-900 mt-2 whitespace-nowrap">
-              {vehicle?.lastUpdated}
-            </span>
-          </div> */}
+
           <Card
             name="Last Updated"
             value={vehicle?.lastUpdated}

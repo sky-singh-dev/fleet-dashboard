@@ -2,6 +2,7 @@ import TuneIcon from "@mui/icons-material/Tune";
 import { useVehicleStore } from "./store/vehicle";
 import { useStatisticsStore } from "./store/statistics";
 import { Alert, Skeleton } from "@mui/material";
+import { useMemo } from "react";
 
 // Define the strict types for our possible filters
 export type StatusFilterType = "all" | "idle" | "en_route" | "delivered";
@@ -21,32 +22,35 @@ export default function StatusFilter() {
   const isError = useStatisticsStore((state) => state.isError);
 
   // Config array matching your exact dashboard UI items
-  const filterOptions: FilterOption[] = [
-    {
-      id: "all",
-      label: "All",
-      count: statistics ? statistics.total : 0,
-      dotClass: "bg-blue-500",
-    },
-    {
-      id: "idle",
-      label: "Idle",
-      count: statistics ? statistics.idle : 0,
-      dotClass: "bg-gray-400",
-    },
-    {
-      id: "en_route",
-      label: "En Route",
-      count: statistics ? statistics.en_route : 0,
-      dotClass: "bg-sky-400",
-    },
-    {
-      id: "delivered",
-      label: "Delivered",
-      count: statistics ? statistics.delivered : 0,
-      dotClass: "bg-green-500",
-    },
-  ];
+  const filterOptions: FilterOption[] = useMemo(
+    () => [
+      {
+        id: "all",
+        label: "All",
+        count: statistics ? statistics.total : 0,
+        dotClass: "bg-blue-500",
+      },
+      {
+        id: "idle",
+        label: "Idle",
+        count: statistics ? statistics.idle : 0,
+        dotClass: "bg-gray-400",
+      },
+      {
+        id: "en_route",
+        label: "En Route",
+        count: statistics ? statistics.en_route : 0,
+        dotClass: "bg-sky-400",
+      },
+      {
+        id: "delivered",
+        label: "Delivered",
+        count: statistics ? statistics.delivered : 0,
+        dotClass: "bg-green-500",
+      },
+    ],
+    [statistics],
+  );
 
   return (
     <div className="w-full">
@@ -72,7 +76,7 @@ export default function StatusFilter() {
               key={option.id}
               onClick={() => setSelectedFilter(option.id)}
               className={`
-                flex items-center gap-2 px-3 py-2.5 rounded-lg border text-xs font-medium transition-all duration-150 cursor-pointer w-full
+                flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-xs font-medium transition-all duration-150 cursor-pointer w-full
                 ${
                   isActive
                     ? "border-blue-600 bg-blue-50/40 text-blue-600 font-semibold shadow-sm"

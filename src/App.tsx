@@ -10,7 +10,7 @@ import WifiOutlinedIcon from "@mui/icons-material/WifiOutlined";
 import { Divider } from "@mui/material";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
-import useWebSocket from "./hooks/useWebSoket";
+import useWebSocket from "./hooks/useWebSocket";
 import type { WebSocketMessage } from "./types/vehicle";
 import { getTimeElapsedBetweenDates } from "./utils/date";
 
@@ -103,8 +103,7 @@ export default function App() {
             </span>
           </h2>
           <span className="text-[11px] px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-bold rounded-full border border-emerald-200 uppercase tracking-wider flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-            Live
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> Live
           </span>
         </div>
 

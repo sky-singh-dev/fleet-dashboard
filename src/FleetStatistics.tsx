@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { getFormattedTimeElapsed } from "./utils/date";
 import { useVehicleStore } from "./store/vehicle";
 
-function StatisticCrd({
+function StatisticCard({
   label,
   value,
   icon,
@@ -25,13 +25,13 @@ function StatisticCrd({
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
       {isLoading ? (
-        <Skeleton variant="text" width={40} sx={{ fontSize: "1rem" }} />
+        <Skeleton variant="text" width={40} sx={{ fontSize: "1rem", mb: 1 }} />
       ) : (
-        <span className="text-2xl font-extrabold text-slate-900 leading-none mb-2">
+        <span className="text-2xl font-extrabold text-slate-900 leading-none mb-1">
           {value}
         </span>
       )}
-      <div className="flex items-center justify-center gap-[2px] text-[12px] font-semibold text-slate-400 uppercase ">
+      <div className="flex items-center justify-center gap-[2px] text-[12px] text-slate-400 uppercase">
         {icon}
         <span>{label}</span>
       </div>
@@ -69,7 +69,7 @@ export default function FleetStatistics() {
       {/* 2x2 Grid Layout for Metrics */}
       <div className="grid grid-cols-2 gap-2 mb-3">
         {/* Total Fleet Item */}
-        <StatisticCrd
+        <StatisticCard
           label="Total Fleet"
           value={stats?.total ?? 0}
           icon={<GroupOutlinedIcon fontSize="small" />}
@@ -78,7 +78,7 @@ export default function FleetStatistics() {
 
         {/* Avg Speed Item */}
 
-        <StatisticCrd
+        <StatisticCard
           label="Avg Speed"
           value={stats?.average_speed ?? 0}
           icon={<ShowChartIcon fontSize="small" />}
@@ -86,7 +86,7 @@ export default function FleetStatistics() {
         />
 
         {/* Moving Item */}
-        <StatisticCrd
+        <StatisticCard
           label="Moving"
           value={stats?.en_route ?? 0}
           icon={<BoltIcon fontSize="small" />}
@@ -94,7 +94,7 @@ export default function FleetStatistics() {
         />
 
         {/* Last Update Item */}
-        <StatisticCrd
+        <StatisticCard
           label="Last Update"
           value={stats?.timestamp ? dayjs(stats.timestamp).format("LT") : "--"}
           icon={<AccessTimeIcon fontSize="small" />}
