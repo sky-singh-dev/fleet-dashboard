@@ -27,7 +27,7 @@ function StatisticCard({
       {isLoading ? (
         <Skeleton variant="text" width={40} sx={{ fontSize: "1rem", mb: 1 }} />
       ) : (
-        <span className="text-2xl font-extrabold text-slate-900 leading-none mb-1">
+        <span className="text-xl font-extrabold text-slate-900 leading-none mb-1">
           {value}
         </span>
       )}
