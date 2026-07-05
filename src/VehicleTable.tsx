@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -10,9 +11,19 @@ import {
   Backdrop,
   Alert,
 } from "@mui/material";
-import type { VehicleStatus } from "./types/vehicle";
+import type { VehicleStatus, Vehicle } from "./types/vehicle"; // Assuming Vehicle type exists here
 import { useVehicleStore } from "./store/vehicle";
 import { VehicleDetailModal } from "./VehicleDetailModal";
+
+// 1. Maintainable object dictionary mapping statuses to Tailwind configurations
+const STATUS_MAP: Record<VehicleStatus, string> = {
+  DELIVERED: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  IDLE: "bg-slate-100 text-slate-600 border-slate-200",
+  "EN ROUTE": "bg-blue-50 text-blue-600 border-blue-200",
+};
+
+// 2. Base structural utility class applied uniformly across cells
+const CELL_BASE_CLASS = "!py-3.5 !border-b !border-slate-100";
 
 export default function VehicleTable() {
   const data = useVehicleStore((state) => state.vehicles);
@@ -22,19 +33,88 @@ export default function VehicleTable() {
     (state) => state.setSelectedVehicle,
   );
 
-  // Dynamic style engine mapping for status pills
-  const getStatusStyles = (status: VehicleStatus) => {
-    switch (status) {
-      case "DELIVERED":
-        return "bg-emerald-50 text-emerald-600 border-emerald-200";
-      case "IDLE":
-        return "bg-slate-100 text-slate-600 border-slate-200";
-      case "EN ROUTE":
-        return "bg-blue-50 text-blue-600 border-blue-200";
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
+  // 3. Centralized Column Definition Schema Configuration
+  const columns = useMemo(
+    () => [
+      {
+        id: "vehicle",
+        label: "Vehicle",
+        render: (row: Vehicle) => (
+          <button
+            onClick={() => setSelectedVehicle(row)}
+            className="text-blue-600 font-semibold hover:underline cursor-pointer text-xs focus:outline-none"
+          >
+            {row.vehicleNumber}
+          </button>
+        ),
+      },
+      {
+        id: "driver",
+        label: "Driver",
+        className: "!text-slate-700 !font-medium !text-xs",
+        render: (row: Vehicle) => row.driverName,
+      },
+      {
+        id: "status",
+        label: "Status",
+        render: (row: Vehicle) => (
+          <span
+            className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold border tracking-wide uppercase ${
+              STATUS_MAP[row.status] || "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {row.status}
+          </span>
+        ),
+      },
+      {
+        id: "speed",
+        label: "Speed",
+        render: (row: Vehicle) => (
+          <span className="inline-block bg-slate-100 text-slate-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded">
+            {row.speed}
+          </span>
+        ),
+      },
+      {
+        id: "destination",
+        label: "Destination",
+        className: "!text-slate-600 !text-xs max-w-[180px] truncate",
+        render: (row: Vehicle) => row.destination,
+      },
+      {
+        id: "eta",
+        label: "ETA",
+        className: "!text-slate-400 !text-xs",
+        render: (row: Vehicle) => row.estimatedArrival,
+      },
+      {
+        id: "lastUpdate",
+        label: "Last Update",
+        className: "!text-slate-600 !text-xs whitespace-nowrap",
+        render: (row: Vehicle) => row.lastUpdated,
+      },
+      {
+        id: "location",
+        label: "Location",
+        className: "!text-slate-500 !font-mono !text-[11px] whitespace-nowrap",
+        render: (row: Vehicle) => row.location,
+      },
+    ],
+    [setSelectedVehicle],
+  );
+
+  // Reusable sub-renderer for cleaner state fallbacks (Empty and Error views)
+  const renderFeedbackRow = (content: React.ReactNode) => (
+    <TableRow sx={{ minHeight: "400px" }}>
+      <TableCell
+        colSpan={columns.length}
+        className="text-center !py-8 !text-slate-400 !text-xs italic"
+      >
+        {content}
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <div className="relative">
@@ -44,117 +124,56 @@ export default function VehicleTable() {
         sx={{ position: "relative" }}
       >
         <Table className="min-w-full" size="small">
-          {/* Table Header Row Layout */}
+          {/* Loop over schemas dynamically to render headers */}
           <TableHead className="bg-slate-50/70">
             <TableRow>
-              {[
-                "Vehicle",
-                "Driver",
-                "Status",
-                "Speed",
-                "Destination",
-                "ETA",
-                "Last Update",
-                "Location",
-              ].map((head) => (
+              {columns.map((col) => (
                 <TableCell
-                  key={head}
+                  key={col.id}
                   className="!text-slate-500 !font-bold !text-xs !py-3 !border-b !border-slate-100"
                 >
-                  {head}
+                  {col.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
 
-          {/* Table Content Body */}
           <TableBody>
+            {/* Main Dynamic Telemetry Row Stream Mapping */}
             {data.map((row) => (
               <TableRow
                 key={row.id}
                 className="hover:bg-slate-50/50 transition-colors group"
               >
-                {/* Vehicle Link ID */}
-                <TableCell className="!py-3.5 !border-b !border-slate-100">
-                  <button
-                    onClick={() => setSelectedVehicle(row)}
-                    className="text-blue-600 font-semibold hover:underline cursor-pointer text-xs focus:outline-none"
+                {columns.map((col) => (
+                  <TableCell
+                    key={col.id}
+                    className={`${CELL_BASE_CLASS} ${col.className || ""}`}
                   >
-                    {row.vehicleNumber}
-                  </button>
-                </TableCell>
-
-                {/* Driver Name */}
-                <TableCell className="!text-slate-700 !font-medium !text-xs !py-3.5 !border-b !border-slate-100">
-                  {row.driverName}
-                </TableCell>
-
-                {/* Status Pill Badge */}
-                <TableCell className="!py-3.5 !border-b !border-slate-100">
-                  <span
-                    className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold border tracking-wide uppercase ${getStatusStyles(row.status)}`}
-                  >
-                    {row.status}
-                  </span>
-                </TableCell>
-
-                {/* Speed Metric Capsule */}
-                <TableCell className="!py-3.5 !border-b !border-slate-100">
-                  <span className="inline-block bg-slate-100 text-slate-800 text-[10px] font-extrabold px-1.5 py-0.5 rounded">
-                    {row.speed}
-                  </span>
-                </TableCell>
-
-                {/* Destination */}
-                <TableCell className="!text-slate-600 !text-xs !py-3.5 !border-b !border-slate-100 max-w-[180px] truncate">
-                  {row.destination}
-                </TableCell>
-
-                {/* ETA */}
-                <TableCell className="!text-slate-400 !text-xs !py-3.5 !border-b !border-slate-100">
-                  {row.estimatedArrival}
-                </TableCell>
-
-                {/* Last Update Date/Time */}
-                <TableCell className="!text-slate-600 !text-xs !py-3.5 !border-b !border-slate-100 whitespace-nowrap">
-                  {row.lastUpdated}
-                </TableCell>
-
-                {/* GPS Coordinates Geolocation */}
-                <TableCell className="!text-slate-500 !font-mono !text-[11px] !py-3.5 !border-b !border-slate-100 whitespace-nowrap">
-                  {row.location}
-                </TableCell>
+                    {col.render(row)}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
 
             {/* Empty fallback state handler */}
-            {data.length === 0 && !isError && (
-              <TableRow sx={{ minHeight: "400px" }}>
-                <TableCell
-                  colSpan={8}
-                  className="text-center !py-8 !text-slate-400 !text-xs italic"
-                >
-                  No vehicles matching this status filter found.
-                </TableCell>
-              </TableRow>
-            )}
+            {data.length === 0 &&
+              !isError &&
+              renderFeedbackRow(
+                "No vehicles matching this status filter found.",
+              )}
 
-            {/* Empty fallback state handler */}
-            {isError && (
-              <TableRow sx={{ minHeight: "400px" }}>
-                <TableCell
-                  colSpan={8}
-                  className="text-center !py-8 !text-slate-400 !text-xs italic"
-                >
-                  <Alert severity="error">
-                    This is an error while fetching vehicle data.
-                  </Alert>
-                </TableCell>
-              </TableRow>
-            )}
+            {/* Error fallback state handler */}
+            {isError &&
+              renderFeedbackRow(
+                <Alert severity="error" className="inline-flex">
+                  This is an error while fetching vehicle data.
+                </Alert>,
+              )}
           </TableBody>
         </Table>
       </TableContainer>
+
       <Backdrop
         sx={(theme) => ({
           position: "absolute",
@@ -166,6 +185,7 @@ export default function VehicleTable() {
       >
         <CircularProgress color="primary" />
       </Backdrop>
+
       <VehicleDetailModal />
     </div>
   );
